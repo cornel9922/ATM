@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 public class AccountController {
@@ -25,9 +26,19 @@ public class AccountController {
 
     @FXML
     private Button withdraw_button;
+    @FXML
+    private TextField withdraw_field;
+
+    @FXML
+    private TextField deposit_field;
 
     @FXML
     void initialize() {
+        if(withdraw_field.getText().matches("[0-9]*")) {
+            withdraw_button.setOnAction(actionEvent -> {
+            });
+        }
+        else withdraw_field.setText("");
     }
 
 }

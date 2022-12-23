@@ -2,7 +2,12 @@ package main.atm;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -35,18 +40,15 @@ public class MainController {
     @FXML
     private Text incorrectData_text;
 
-
-    int money = 15000;
-    int cardNumber = 84652321;
-    int CVV = 464;
     int count = 0;
 
     @FXML
     void initialize() {
         enter_button.setOnAction(actionEvent -> {
-            if(cardNumber_field.getText().equals("84652321") && cvv_field.getText().equals("464"))
-        {
-                showNewScene(enter_button, "account-view.fxml");
+            String cardNumber = cardNumber_field.getText().trim();
+            String CVV = cvv_field.getText().trim();
+            if (!cardNumber.equals(null) && !CVV.equals(null)){
+                loginUser(cardNumber, CVV);
             }
             else {
                 count++;
@@ -56,8 +58,32 @@ public class MainController {
         });
 
     }
+    public void loginUser(String cardNumber, String CVV) {
+        DBHandler dbHandler = new DBHandler();
+        User user = new User();
+        user.setCardNumber(cardNumber);
+        user.setCVV(CVV);
+        ResultSet result = dbHandler.getUser(user);
 
-    public void showNewScene(Button button, String window) {
+        int counter = 0;
+
+        while(true) {
+            try {
+                if (!result.next()) break;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            counter++;
+        }
+
+        if (counter >= 1) {
+            openNewScene(enter_button,"account-view.fxml");
+        }
+        else incorrectData_text.setText("Incorrect data");
+
+    }
+
+    public void openNewScene(Button button, String window) {
         button.getScene().getWindow().hide();
 
         FXMLLoader loader = new FXMLLoader();
@@ -69,11 +95,12 @@ public class MainController {
         }
         Parent root = loader.getRoot();
         Stage stage = new Stage();
-        stage.getIcons().add(new Image("C:\\Users\\Cornel\\IdeaProjects\\ATM\\src\\main\\resources\\images\\share.png"));
+        stage.getIcons().add(new Image("C:\\Users\\Cornel\\IdeaProjects\\AppSkill1\\src\\main\\resources\\images\\app_image.png"));
         stage.setTitle("MordeATM");
         stage.setResizable(false);
         stage.setScene(new Scene(root));
         stage.show();
+
     }
 
 }
